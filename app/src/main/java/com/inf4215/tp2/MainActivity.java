@@ -1,9 +1,11 @@
 package com.inf4215.tp2;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -20,6 +22,11 @@ public class MainActivity extends ActionBarActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    public void onGPSButtonClick(View v){
+        Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
     }
 
     @Override

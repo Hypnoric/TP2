@@ -26,6 +26,7 @@
             android:layout_height="wrap_content"
             android:text="GPS"
             android:id="@+id/GPSBtn"
+            android:onClick="onGPSButtonClick"
             android:layout_gravity="center_horizontal|top"
             android:layout_marginTop="50dp"
             android:layout_marginRight="50dp" />
