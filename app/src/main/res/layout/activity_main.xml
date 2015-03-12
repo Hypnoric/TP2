@@ -15,21 +15,11 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Reseau Cell"
-            android:id="@+id/reseauCellBtn"
-            android:layout_gravity="center_horizontal|top"
-            android:layout_marginTop="50dp"
-            android:layout_marginLeft="50dp" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:text="GPS"
             android:id="@+id/GPSBtn"
             android:onClick="onGPSButtonClick"
             android:layout_gravity="center_horizontal|top"
-            android:layout_marginTop="50dp"
-            android:layout_marginRight="50dp" />
+            android:layout_marginTop="50dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -38,13 +28,16 @@
             android:text="Mode de localisation"
             android:id="@+id/textView"
             android:layout_gravity="center_horizontal|top"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="10dp"
+            android:textColor="#ffffffff" />
 
         <SeekBar
             android:layout_width="157dp"
             android:layout_height="wrap_content"
             android:id="@+id/seekBar"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:layout_marginTop="75dp"
+            android:background="#ffffffff" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -53,7 +46,8 @@
             android:text="Zoom initial minimal"
             android:id="@+id/textView2"
             android:layout_gravity="center"
-            android:layout_marginBottom="50dp" />
+            android:layout_marginTop="40dp"
+            android:textColor="#ffffffff" />
 
         <Button
             android:layout_width="wrap_content"
@@ -61,7 +55,7 @@
             android:text="Historique"
             android:id="@+id/historiqueBtn"
             android:layout_gravity="center"
-            android:layout_marginTop="70dp" />
+            android:layout_marginTop="130dp" />
 
         <Button
             android:layout_width="wrap_content"
@@ -70,6 +64,27 @@
             android:id="@+id/quitBtn"
             android:layout_gravity="center_horizontal|bottom"
             android:layout_marginBottom="50dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Frequence de mise a jour (s)"
+            android:id="@+id/textView3"
+            android:layout_gravity="center_horizontal|top"
+            android:textColor="#ffffffff"
+            android:layout_marginTop="120dp" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="2"
+            android:id="@+id/frequency"
+            android:layout_gravity="center_horizontal|top"
+            android:textColor="#ffffffff"
+            android:text="10"
+            android:layout_marginTop="150dp"
+            android:inputType="number"/>
 
     </FrameLayout>
 

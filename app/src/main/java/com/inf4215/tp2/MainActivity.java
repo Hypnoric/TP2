@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.NumberPicker;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -24,10 +26,16 @@ public class MainActivity extends ActionBarActivity {
         return true;
     }
 
-    public void onGPSButtonClick(View v){
+    public void onGPSButtonClick(View v) {
         Intent intent = new Intent(this, MapsActivity.class);
         startActivity(intent);
     }
+
+    public void onTextChangeListener()
+    {
+
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
