@@ -9,8 +9,44 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#ff000000"
+        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Mode de localisation"
+            android:id="@+id/textView"
+            android:layout_gravity="center_horizontal|top"
+            android:layout_marginTop="10dp"
+            android:textColor="#ffffffff" />
+
+        <SeekBar
+            android:layout_width="165dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/zoomBar"
+            android:layout_gravity="center"
+            android:layout_marginBottom="40dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Zoom initial minimal"
+            android:id="@+id/textView2"
+            android:layout_gravity="center"
+            android:layout_marginBottom="75dp"
+            android:textColor="#ffffffff" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Quitter"
+            android:id="@+id/quitBtn"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginBottom="20dp" />
 
         <Button
             android:layout_width="wrap_content"
@@ -31,45 +67,45 @@
             android:layout_marginTop="50dp"
             android:layout_marginRight="50dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Mode de localisation"
-            android:id="@+id/textView"
-            android:layout_gravity="center_horizontal|top"
-            android:layout_marginTop="10dp" />
-
-        <SeekBar
-            android:layout_width="157dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/seekBar"
-            android:layout_gravity="center" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Zoom initial minimal"
-            android:id="@+id/textView2"
-            android:layout_gravity="center"
-            android:layout_marginBottom="50dp" />
-
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Historique"
             android:id="@+id/historiqueBtn"
-            android:layout_gravity="center"
-            android:layout_marginTop="70dp" />
+            android:onClick="onHistoriqueButtonClick"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginBottom="100dp"/>
 
-        <Button
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Quitter"
-            android:id="@+id/quitBtn"
-            android:layout_gravity="center_horizontal|bottom"
-            android:layout_marginBottom="50dp" />
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Fréquence de mise a jour"
+            android:id="@+id/textView3"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:textColor="#ffffffff" />
+
+        <SeekBar
+            android:layout_width="158dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/frequenceBar"
+            android:layout_gravity="center"
+            android:layout_marginTop="50dp"
+            android:indeterminate="false"
+            android:nestedScrollingEnabled="false"
+            android:layout_marginRight="50dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="min"
+            android:id="@+id/textView4"
+            android:layout_gravity="center"
+            android:layout_marginTop="50dp"
+            android:textColor="#ffffffff"
+            android:layout_marginLeft="70dp" />
 
     </FrameLayout>
 
