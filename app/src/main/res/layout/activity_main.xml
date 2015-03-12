@@ -8,7 +8,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#ff000000"
+        android:background="#ffffffff"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true">
 
@@ -29,7 +29,7 @@
             android:id="@+id/textView"
             android:layout_gravity="center_horizontal|top"
             android:layout_marginTop="10dp"
-            android:textColor="#ffffffff" />
+            android:textColor="@android:color/black" />
 
         <SeekBar
             android:layout_width="157dp"
@@ -37,7 +37,7 @@
             android:id="@+id/seekBar"
             android:layout_gravity="center"
             android:layout_marginTop="75dp"
-            android:background="#ffffffff" />
+            android:background="#00000000" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -47,7 +47,7 @@
             android:id="@+id/textView2"
             android:layout_gravity="center"
             android:layout_marginTop="40dp"
-            android:textColor="#ffffffff" />
+            android:textColor="@android:color/black" />
 
         <Button
             android:layout_width="wrap_content"
@@ -73,7 +73,7 @@
             android:text="Frequence de mise a jour"
             android:id="@+id/textView3"
             android:layout_gravity="center_horizontal|top"
-            android:textColor="#ffffffff"
+            android:textColor="@android:color/black"
             android:layout_marginTop="120dp" />
 
         <SeekBar
@@ -82,7 +82,7 @@
             android:id="@+id/frequenceBar"
             android:layout_gravity="center_horizontal|top"
             android:layout_marginTop="180dp"
-            android:background="#ffffffff"
+            android:background="#00000000"
             android:max="100"
             android:progress="0" />
 
@@ -93,8 +93,8 @@
             android:text="10"
             android:id="@+id/freqText"
             android:layout_gravity="center_horizontal|top"
-            android:layout_marginTop="150dp"
-            android:textColor="#ffffffff" />
+            android:layout_marginTop="225dp"
+            android:textColor="@android:color/black" />
 
     </FrameLayout>
 
