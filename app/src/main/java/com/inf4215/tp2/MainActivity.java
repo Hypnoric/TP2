@@ -6,8 +6,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.NumberPicker;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -16,6 +16,29 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        SeekBar seekBar = (SeekBar)findViewById(R.id.frequenceBar);
+        final TextView seekBarValue = (TextView)findViewById(R.id.freqText);
+        seekBarValue.setText(String.valueOf(seekBar.getProgress()) + " min");
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress,
+                                          boolean fromUser) {
+                seekBarValue.setText(String.valueOf(progress) + " min");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+        });
     }
 
 
@@ -26,16 +49,15 @@ public class MainActivity extends ActionBarActivity {
         return true;
     }
 
-    public void onGPSButtonClick(View v) {
+    public void onGPSButtonClick(View v){
         Intent intent = new Intent(this, MapsActivity.class);
         startActivity(intent);
     }
 
-    public void onTextChangeListener()
-    {
-
+    public void onHistoriqueButtonClick(View v){
+        Intent intent = new Intent(this, HistoryActivity.class);
+        startActivity(intent);
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
