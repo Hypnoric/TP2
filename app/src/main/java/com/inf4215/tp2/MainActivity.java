@@ -24,6 +24,15 @@ public class MainActivity extends ActionBarActivity {
         if(trajets == null)
         {
             trajets = openOrCreateDatabase("trajets", MODE_PRIVATE, null);
+
+            //////////a enlever
+            trajets.execSQL("CREATE TABLE IF NOT EXISTS Trajet1(Depart VARCHAR,Arrivee VARCHAR);");
+            trajets.execSQL("INSERT INTO Trajet1 VALUES('depart1','arrivee1');");
+            trajets.execSQL("CREATE TABLE IF NOT EXISTS Trajet2(Depart VARCHAR,Arrivee VARCHAR);");
+            trajets.execSQL("INSERT INTO Trajet2 VALUES('depart2','arrivee2');");
+            trajets.execSQL("CREATE TABLE IF NOT EXISTS Trajet3(Depart VARCHAR,Arrivee VARCHAR);");
+            trajets.execSQL("INSERT INTO Trajet3 VALUES('depart3','arrivee3');");
+            //////////
         }
 
         SeekBar seekBar = (SeekBar)findViewById(R.id.frequenceBar);
