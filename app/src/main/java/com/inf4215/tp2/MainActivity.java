@@ -1,5 +1,7 @@
 package com.inf4215.tp2;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -8,25 +10,55 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
+import android.database.sqlite.SQLiteDatabase;
 
 public class MainActivity extends ActionBarActivity {
+
+    public static SQLiteDatabase trajets;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if(trajets == null)
+        {
+            trajets = openOrCreateDatabase("trajets", MODE_PRIVATE, null);
+        }
+
         SeekBar seekBar = (SeekBar)findViewById(R.id.frequenceBar);
         final TextView seekBarValue = (TextView)findViewById(R.id.freqText);
-        seekBarValue.setText(String.valueOf(seekBar.getProgress()) + " min");
+        seekBarValue.setText(String.valueOf(frequencyValue(seekBar.getProgress()) + " secondes"));
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress,
                                           boolean fromUser) {
-                seekBarValue.setText(String.valueOf(progress) + " min");
+                seekBarValue.setText(frequencyValue(seekBar.getProgress()) + " secondes");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+        });
+
+        SeekBar zoomSeekBar = (SeekBar)findViewById(R.id.zoomBar);
+        final TextView zoomSeekBarValue = (TextView)findViewById(R.id.zoomText);
+        zoomSeekBarValue.setText(String.valueOf(zoomSeekBar.getProgress() + " X"));
+
+        zoomSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
+
+            @Override
+            public void onProgressChanged(SeekBar zoomSeekBar, int progress,
+                                          boolean fromUser) {
+                zoomSeekBarValue.setText(zoomSeekBar.getProgress() + " X");
             }
 
             @Override
@@ -41,6 +73,36 @@ public class MainActivity extends ActionBarActivity {
         });
     }
 
+    public int frequencyValue(int frequenceProgressBarValue)
+    {
+        int value = (frequenceProgressBarValue/5) * 15  + 30;
+        return value;
+    }
+
+    public void onBackPressed() {
+        AlertDialog diaBox = AskOption();
+        diaBox.show();
+    }
+
+    private AlertDialog AskOption()
+    {
+        AlertDialog myQuittingDialogBox =new AlertDialog.Builder(this)
+                .setTitle("Quitter")
+                .setMessage("Voulez vous quitter l'application?")
+
+                .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        finish();
+                    }
+                })
+                .setNegativeButton("Non", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create();
+        return myQuittingDialogBox;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -52,6 +114,11 @@ public class MainActivity extends ActionBarActivity {
     public void onGPSButtonClick(View v){
         Intent intent = new Intent(this, MapsActivity.class);
         startActivity(intent);
+    }
+
+    public void onQuitButtonClick(View v){
+        AlertDialog diaBox = AskOption();
+        diaBox.show();
     }
 
     public void onHistoriqueButtonClick(View v){

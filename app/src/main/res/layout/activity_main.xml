@@ -34,7 +34,7 @@
         <SeekBar
             android:layout_width="157dp"
             android:layout_height="wrap_content"
-            android:id="@+id/seekBar"
+            android:id="@+id/zoomBar"
             android:layout_gravity="center"
             android:layout_marginTop="75dp"
             android:background="#00000000" />
@@ -63,6 +63,7 @@
             android:layout_height="wrap_content"
             android:text="Quitter"
             android:id="@+id/quitBtn"
+            android:onClick="onQuitButtonClick"
             android:layout_gravity="center_horizontal|bottom"
             android:layout_marginBottom="50dp" />
 
@@ -95,6 +96,17 @@
             android:layout_gravity="center_horizontal|top"
             android:layout_marginTop="225dp"
             android:textColor="@android:color/black" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="10 X"
+            android:id="@+id/zoomText"
+            android:layout_gravity="right|center_vertical"
+            android:layout_marginTop="70dp"
+            android:textColor="@android:color/black"
+            android:layout_marginRight="50dp" />
 
     </FrameLayout>
 
