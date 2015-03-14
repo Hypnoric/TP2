@@ -15,6 +15,7 @@ import android.database.sqlite.SQLiteDatabase;
 public class MainActivity extends ActionBarActivity {
 
     public static SQLiteDatabase trajets;
+    private static int cptBD;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,15 +24,16 @@ public class MainActivity extends ActionBarActivity {
 
         if(trajets == null)
         {
+            cptBD = 1;
             trajets = openOrCreateDatabase("trajets", MODE_PRIVATE, null);
 
             //////////a enlever
             trajets.execSQL("CREATE TABLE IF NOT EXISTS Trajet1(Depart VARCHAR,Arrivee VARCHAR);");
-            trajets.execSQL("INSERT INTO Trajet1 VALUES('depart1','arrivee1');");
-            trajets.execSQL("CREATE TABLE IF NOT EXISTS Trajet2(Depart VARCHAR,Arrivee VARCHAR);");
-            trajets.execSQL("INSERT INTO Trajet2 VALUES('depart2','arrivee2');");
-            trajets.execSQL("CREATE TABLE IF NOT EXISTS Trajet3(Depart VARCHAR,Arrivee VARCHAR);");
-            trajets.execSQL("INSERT INTO Trajet3 VALUES('depart3','arrivee3');");
+            //trajets.execSQL("INSERT INTO Trajet1 VALUES('depart1','arrivee1');");
+            //trajets.execSQL("CREATE TABLE IF NOT EXISTS Trajet2(Depart VARCHAR,Arrivee VARCHAR);");
+            //trajets.execSQL("INSERT INTO Trajet2 VALUES('depart2','arrivee2');");
+            //trajets.execSQL("CREATE TABLE IF NOT EXISTS Trajet3(Depart VARCHAR,Arrivee VARCHAR);");
+            //trajets.execSQL("INSERT INTO Trajet3 VALUES('depart3','arrivee3');");
             //////////
         }
 
@@ -82,8 +84,33 @@ public class MainActivity extends ActionBarActivity {
         });
     }
 
-    public int frequencyValue(int frequenceProgressBarValue)
-    {
+    public int getCptDb(){
+        return cptBD;
+    }
+
+    public void addToDataBase(String adresseDepart, String adresseArrivee, MapsActivity.PointDeMarquage[] ptsMarquages){
+        String tableName = "Trajet" + Integer.toString(cptBD);
+        trajets.execSQL("DROP TABLE IF EXISTS " + tableName);
+        trajets.execSQL("CREATE TABLE IF NOT EXISTS "+ tableName + "(Depart VARCHAR,Arrivee VARCHAR);");
+        String inserts = "'" + adresseDepart + "','" + adresseArrivee + "'";
+        trajets.execSQL("INSERT INTO "+ tableName + " VALUES(" + inserts + ");");
+        for(int i = 0; i < ptsMarquages.length; ++i){
+            trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Latitude" + Integer.toString(i) + " DOUBLE");
+            trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Longitude" + Integer.toString(i) + " DOUBLE");
+            trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Altitude" + Integer.toString(i) + " DOUBLE");
+            /*trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Deplacement" + Integer.toString(i) + " VARCHAR");
+            trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Distance" + Integer.toString(i) + " DOUBLE");
+            trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Batterie" + Integer.toString(i) + " DOUBLE");*/
+            inserts = "'" + ptsMarquages[i].latitude + "','" + ptsMarquages[i].longitude + "','" + ptsMarquages[i].altitude + "'";
+            trajets.execSQL("INSERT INTO "+ tableName + " VALUES(" + inserts + ");");
+        }
+
+        ++cptBD;
+        if(cptBD > 3)
+            cptBD = 1;
+    }
+
+    public int frequencyValue(int frequenceProgressBarValue){
         int value = (frequenceProgressBarValue/5) * 15  + 30;
         return value;
     }

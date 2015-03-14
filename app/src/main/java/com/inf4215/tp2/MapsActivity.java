@@ -4,10 +4,6 @@ import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -18,31 +14,30 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
-//import android.location.LocationListener;
+import android.location.LocationListener;
 import android.location.LocationManager;
 
 import java.util.ArrayList;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, LocationListener{
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener{
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    private GoogleApiClient mGoogleApiClient;
     private LocationManager locationManager;
-    private Location mLastKnownLocation;
+    private String adresseDepart;
+    private String adresseArrivee;
+
     private PointDeMarquage depart;
     private PointDeMarquage arriver;
     private ArrayList<PointDeMarquage> points = new ArrayList<PointDeMarquage>();
     private String provider;
-    private boolean trackingEnabled = false;
-    private boolean locationEnabled = false;
 
     public class PointDeMarquage {
         public double latitude;
         public double longitude;
         public double altitude;
-        // Direction déplacement
-        // Distance relative parcourue
-        // Distance Total
+        // Direction array 3 float déplacement
+        // Distance relative parcourue double
+        // Distance Total double
         // Mode De Localisation (GPS)
         // Alarme + capture image d'identification de l'environnement
         // Niveau de batterie
@@ -52,76 +47,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        buildGoogleApiClient();
-        setUpMap();
-    }
-
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                //.addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
-
-    private void RetrievePositionInformation() {
-        PointDeMarquage point = new PointDeMarquage();
-        //Location location = locationManager.getLastKnownLocation(provider);
-        Location location = mLastKnownLocation;
-        if(location != null){
-            point.latitude = location.getLatitude();
-            point.longitude = location.getLongitude();
-            point.altitude = location.getAltitude();
-            String markerInfo = "Marker " + points.size() + "\nLatitude : " + point.latitude + "\nLongitude : " + point.longitude + "\nAltitude : " + point.altitude;
-            mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(point.latitude, point.longitude))
-                    .title(markerInfo));
-            points.add(point);
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        setUpMap();
-
-        if (mGoogleApiClient.isConnected()) {
-            startLocationUpdates();
-        }
-    }
-
-    protected void startLocationUpdates() {
-        LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(5000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, locationRequest, this);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if(mGoogleApiClient.isConnected())
-            stopLocationUpdates();
-    }
-
-    protected void stopLocationUpdates() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-    }
-
-    private void setUpMap() {
-        // Do a null check to confirm that we have not already instantiated the map.
-        if (mMap == null) {
-            MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
-            mapFragment.getMapAsync(this);
-        }
-    }
-
-    @Override
-    public void onMapReady(GoogleMap map) {
-        mMap = map;
-        mMap.setMyLocationEnabled(true);
+        setUpMapIfNeeded();
 
         // Get the location manager
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -131,46 +57,97 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         provider = locationManager.getBestProvider(criteria, false);
         Location location = locationManager.getLastKnownLocation(provider);
 
-        if(location != null){
-            mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                    .title("Marker " + points.size()));
-        }
+        // Here ask for starting point and final point
 
-        trackingEnabled = true;
         final Handler handler=new Handler();
         handler.post(new Runnable(){
 
             @Override
             public void run() {
-                if (trackingEnabled) {
-                    RetrievePositionInformation();
-                    handler.postDelayed(this, 5000); // Change this time in function of sampling frequency
-                }
+                RetrievePositionInformation();
+                handler.postDelayed(this,5000); // Change this time in function of sampling frequency
             }
+
         });
+
+        // Initialize the location fields
+        if (location != null) {
+            System.out.println("Provider " + provider + " has been selected.");
+            onLocationChanged(location);
+        }
+    }
+
+    private void RetrievePositionInformation() {
+        PointDeMarquage point = new PointDeMarquage();
+        Location location = locationManager.getLastKnownLocation(provider);
+        point.latitude = location.getLatitude();
+        point.longitude = location.getLongitude();
+        point.altitude = location.getAltitude();
+        mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(point.latitude, point.longitude))
+                .title("Marker " + points.size()));
+        points.add(point);
     }
 
     @Override
-    public void onConnected(Bundle connectionHint) {
-        //locationEnabled = true;
+    protected void onResume() {
+        super.onResume();
+        setUpMapIfNeeded();
+    }
 
-        startLocationUpdates();
+    /**
+     * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
+     * installed) and the map has not already been instantiated.. This will ensure that we only ever
+     * call {@link #setUpMap()} once when {@link #mMap} is not null.
+     * <p/>
+     * If it isn't installed {@link SupportMapFragment} (and
+     * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
+     * install/update the Google Play services APK on their device.
+     * <p/>
+     * A user can return to this FragmentActivity after following the prompt and correctly
+     * installing/updating/enabling the Google Play services. Since the FragmentActivity may not
+     * have been completely destroyed during this process (it is likely that it would only be
+     * stopped or paused), {@link #onCreate(android.os.Bundle)} may not be called again so we should call this
+     * method in {@link #onResume()} to guarantee that it will be called.
+     */
+    private void setUpMapIfNeeded() {
+        // Do a null check to confirm that we have not already instantiated the map.
+        if (mMap == null) {
+            MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+            mapFragment.getMapAsync(this);
+            /*// Try to obtain the map from the SupportMapFragment.
+            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap().getMapAsync(this);
+            // Check if we were successful in obtaining the map.
+            if (mMap != null) {
+                //setUpMap();
+            }*/
+        }
+    }
+
+    /**
+     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
+     * just add a marker near Africa.
+     * <p/>
+     * This should only be called once and when we are sure that {@link #mMap} is not null.
+     */
+    private void setUpMap() {
+        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
     }
 
     @Override
-    public void onConnectionSuspended(int i) {
-        locationEnabled = false;
+    public void onMapReady(GoogleMap map) {
+        mMap = map;
+        /*map.addMarker(new MarkerOptions()
+                .position(new LatLng(10, 10))
+                .title("Hello world"));*/
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        mLastKnownLocation = location;
     }
 
-    /*@Override
+    @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-
     }
 
     @Override
@@ -180,6 +157,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onProviderDisabled(String provider) {
-
-    }*/
+    }
 }
