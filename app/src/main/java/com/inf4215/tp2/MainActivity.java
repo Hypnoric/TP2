@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.database.sqlite.SQLiteDatabase;
@@ -102,10 +104,6 @@ public class MainActivity extends ActionBarActivity {
         return trajet3Existe;
     }
 
-    static public int getCptDb(){
-        return cptBD;
-    }
-
     static public void addToDataBase(String adresseDepart, String adresseArrivee, MapsActivity.PointDeMarquage[] ptsMarquages){
         String tableName = "Trajet" + Integer.toString(cptBD);
         trajets.execSQL("DROP TABLE IF EXISTS " + tableName);
@@ -141,11 +139,11 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void onBackPressed() {
-        AlertDialog diaBox = AskOption();
+        AlertDialog diaBox = askOption();
         diaBox.show();
     }
 
-    private AlertDialog AskOption()
+    private AlertDialog askOption()
     {
         AlertDialog myQuittingDialogBox =new AlertDialog.Builder(this)
                 .setTitle("Quitter")
@@ -165,6 +163,48 @@ public class MainActivity extends ActionBarActivity {
         return myQuittingDialogBox;
     }
 
+    private AlertDialog askTrajet()
+    {
+        final EditText depart = new EditText(this);
+        final EditText arrivee = new EditText(this);
+        final TextView labelDep = new TextView(this);
+        final TextView labelArr = new TextView(this);
+
+        labelDep.setText("Depart");
+        labelArr.setText("Arrivee");
+
+        LinearLayout lay = new LinearLayout(this);
+        lay.setOrientation(LinearLayout.VERTICAL);
+        lay.addView(labelDep);
+        lay.addView(depart);
+        lay.addView(labelArr);
+        lay.addView(arrivee);
+
+        AlertDialog myQuittingDialogBox =new AlertDialog.Builder(this)
+                .setTitle("Trajet")
+                .setMessage("Entrez les adresses de depart et d'arrivee")
+                .setView(lay)
+
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        openMap();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create();
+
+        return myQuittingDialogBox;
+    }
+
+    private void openMap(){
+        Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -173,12 +213,12 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void onGPSButtonClick(View v){
-        Intent intent = new Intent(this, MapsActivity.class);
-        startActivity(intent);
+        AlertDialog diaBox = askTrajet();
+        diaBox.show();
     }
 
     public void onQuitButtonClick(View v){
-        AlertDialog diaBox = AskOption();
+        AlertDialog diaBox = askOption();
         diaBox.show();
     }
 

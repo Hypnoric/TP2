@@ -47,6 +47,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //On doit recevoir les points de depart et d'arrivee en parametre (string)
+        //On utilisera geocoder pour obtenir la latitude et logitude de ces points de depart pour creer les points de marquages
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
