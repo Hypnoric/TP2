@@ -172,6 +172,8 @@ public class MainActivity extends ActionBarActivity {
 
         labelDep.setText("Depart");
         labelArr.setText("Arrivee");
+        depart.setText("4202 Joffre, Montreal");
+        arrivee.setText("2900 Boulevard Edouard-Montpetit, Montreal");
 
         LinearLayout lay = new LinearLayout(this);
         lay.setOrientation(LinearLayout.VERTICAL);
@@ -187,7 +189,7 @@ public class MainActivity extends ActionBarActivity {
 
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        openMap();
+                        openMap(depart.getText().toString(), arrivee.getText().toString());
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -200,8 +202,10 @@ public class MainActivity extends ActionBarActivity {
         return myQuittingDialogBox;
     }
 
-    private void openMap(){
+    private void openMap(String depart, String arrivee){
         Intent intent = new Intent(this, MapsActivity.class);
+        intent.putExtra("depart", depart);
+        intent.putExtra("arrivee", arrivee);
         startActivity(intent);
     }
 
