@@ -15,32 +15,38 @@ public class HistoryActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
 
-        Cursor resultSet = MainActivity.trajets.rawQuery("Select * from Trajet1", null);
-        resultSet.moveToFirst();
-        String depart = resultSet.getString(0);
-        String arrivee = resultSet.getString(1);
+        if(MainActivity.getTrajet1Existe()) {
+            Cursor resultSet = MainActivity.trajets.rawQuery("Select * from Trajet1", null);
+            resultSet.moveToFirst();
+            String depart = resultSet.getString(0);
+            String arrivee = resultSet.getString(1);
 
-        final Button btn1 = (Button) findViewById(R.id.button);
-        btn1.setText(depart + " - " + arrivee);
-        btn1.setEnabled(true);
+            final Button btn1 = (Button) findViewById(R.id.button);
+            btn1.setText(depart + " - " + arrivee);
+            btn1.setEnabled(true);
+        }
 
-        resultSet = MainActivity.trajets.rawQuery("Select * from Trajet2",null);
-        resultSet.moveToFirst();
-        depart = resultSet.getString(0);
-        arrivee = resultSet.getString(1);
+        if(MainActivity.getTrajet2Existe()) {
+            Cursor resultSet = MainActivity.trajets.rawQuery("Select * from Trajet2", null);
+            resultSet.moveToFirst();
+            String depart = resultSet.getString(0);
+            String arrivee = resultSet.getString(1);
 
-        final Button btn2 = (Button) findViewById(R.id.button2);
-        btn2.setText(depart + " - " + arrivee);
-        btn2.setEnabled(true);
+            final Button btn2 = (Button) findViewById(R.id.button2);
+            btn2.setText(depart + " - " + arrivee);
+            btn2.setEnabled(true);
+        }
 
-        resultSet = MainActivity.trajets.rawQuery("Select * from Trajet3",null);
-        resultSet.moveToFirst();
-        depart = resultSet.getString(0);
-        arrivee = resultSet.getString(1);
+        if(MainActivity.getTrajet3Existe()) {
+            Cursor resultSet = MainActivity.trajets.rawQuery("Select * from Trajet3", null);
+            resultSet.moveToFirst();
+            String depart = resultSet.getString(0);
+            String arrivee = resultSet.getString(1);
 
-        final Button btn3 = (Button) findViewById(R.id.button3);
-        btn3.setText(depart + " - " + arrivee);
-        btn3.setEnabled(true);
+            final Button btn3 = (Button) findViewById(R.id.button3);
+            btn3.setText(depart + " - " + arrivee);
+            btn3.setEnabled(true);
+        }
     }
 
 

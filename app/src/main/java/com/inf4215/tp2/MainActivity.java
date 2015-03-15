@@ -16,6 +16,9 @@ public class MainActivity extends ActionBarActivity {
 
     public static SQLiteDatabase trajets;
     private static int cptBD;
+    private static boolean trajet1Existe;
+    private static boolean trajet2Existe;
+    private static boolean trajet3Existe;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,8 +30,11 @@ public class MainActivity extends ActionBarActivity {
             cptBD = 1;
             trajets = openOrCreateDatabase("trajets", MODE_PRIVATE, null);
 
+            trajet1Existe = false;
+            trajet2Existe = false;
+            trajet3Existe = false;
             //////////a enlever
-            trajets.execSQL("CREATE TABLE IF NOT EXISTS Trajet1(Depart VARCHAR,Arrivee VARCHAR);");
+            //trajets.execSQL("CREATE TABLE IF NOT EXISTS Trajet1(Depart VARCHAR,Arrivee VARCHAR);");
             //trajets.execSQL("INSERT INTO Trajet1 VALUES('depart1','arrivee1');");
             //trajets.execSQL("CREATE TABLE IF NOT EXISTS Trajet2(Depart VARCHAR,Arrivee VARCHAR);");
             //trajets.execSQL("INSERT INTO Trajet2 VALUES('depart2','arrivee2');");
@@ -84,11 +90,23 @@ public class MainActivity extends ActionBarActivity {
         });
     }
 
-    public int getCptDb(){
+    static public boolean getTrajet1Existe(){
+        return trajet1Existe;
+    }
+
+    static public boolean getTrajet2Existe(){
+        return trajet2Existe;
+    }
+
+    static public boolean getTrajet3Existe(){
+        return trajet3Existe;
+    }
+
+    static public int getCptDb(){
         return cptBD;
     }
 
-    public void addToDataBase(String adresseDepart, String adresseArrivee, MapsActivity.PointDeMarquage[] ptsMarquages){
+    static public void addToDataBase(String adresseDepart, String adresseArrivee, MapsActivity.PointDeMarquage[] ptsMarquages){
         String tableName = "Trajet" + Integer.toString(cptBD);
         trajets.execSQL("DROP TABLE IF EXISTS " + tableName);
         trajets.execSQL("CREATE TABLE IF NOT EXISTS "+ tableName + "(Depart VARCHAR,Arrivee VARCHAR);");
@@ -104,6 +122,13 @@ public class MainActivity extends ActionBarActivity {
             inserts = "'" + ptsMarquages[i].latitude + "','" + ptsMarquages[i].longitude + "','" + ptsMarquages[i].altitude + "'";
             trajets.execSQL("INSERT INTO "+ tableName + " VALUES(" + inserts + ");");
         }
+
+        if(cptBD == 1)
+            trajet1Existe = true;
+        if(cptBD == 2)
+            trajet2Existe = true;
+        if(cptBD == 3)
+            trajet3Existe = true;
 
         ++cptBD;
         if(cptBD > 3)
