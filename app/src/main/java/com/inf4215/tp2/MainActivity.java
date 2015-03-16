@@ -236,6 +236,15 @@ public class MainActivity extends ActionBarActivity {
         startActivity(intent);
     }
 
+    private void openReplayMap(String depart, String arrivee){
+        Intent intent = new Intent(this, MapsActivity.class);
+        intent.putExtra("depart", depart);
+        intent.putExtra("arrivee", arrivee);
+        intent.putExtra("zoomFactor", zoomFactor);
+        intent.putExtra("locatingFrequency", locatingFrequency);
+        startActivity(intent);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

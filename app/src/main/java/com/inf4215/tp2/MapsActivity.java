@@ -60,6 +60,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private PointDeMarquage arrivee;
     private PointDeMarquage dernierPointDeMarquage;
     private boolean destinationReached = false;
+    private Marker arriveeMarker = null;
     //private ArrayList<PointDeMarquage> points = new ArrayList<PointDeMarquage>();
     private HashMap<Marker, PointDeMarquage> pointMarkerMap = new HashMap<Marker, PointDeMarquage>();
     private String provider;
@@ -69,6 +70,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private int locatingFrequency = 0;
     private Intent batteryStatus;
     private WifiManager wifi;
+    private boolean playbackMode = false;
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
@@ -111,6 +113,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             adresseArrivee = extras.getString("arrivee");
             zoomFactor = extras.getFloat("zoomFactor");
             locatingFrequency = extras.getInt("locatingFrequency");
+            playbackMode = extras.getBoolean("playbackMode");
         }
 
         depart = getLatLongFromAddress(adresseDepart);
@@ -160,6 +163,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //Less than 10 meters from destination ... considered reached
                 destinationReached = true;
                 Toast.makeText(getApplicationContext(), "You have reached your destination", Toast.LENGTH_LONG).show();
+                if (arrivee != null) {
+                    pointMarkerMap.put(arriveeMarker, arrivee);
+                    dernierPointDeMarquage = arrivee;
+                }
+                stopLocationUpdates();
             }
 
             int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
@@ -167,7 +175,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             float batteryPct = level / (float)scale;
 
-            point.batterieLevel = (int)(batteryPct * 100);
+            point.batterieLevel = (int)(batteryPct * 100.0f);
 
             if(location.hasBearing()){
                 float bearing = location.getBearing();
@@ -221,7 +229,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onResume();
         setUpMap();
 
-        if (mGoogleApiClient.isConnected()) {
+        if (mGoogleApiClient.isConnected() && !destinationReached) {
             startLocationUpdates();
         }
     }
@@ -239,7 +247,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onPause() {
         super.onPause();
-        if (mGoogleApiClient.isConnected())
+        if (mGoogleApiClient.isConnected() && !destinationReached)
             stopLocationUpdates();
     }
 
@@ -258,28 +266,56 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap map) {
         mMap = map;
-        mMap.setMyLocationEnabled(true);
 
-        // Get the location manager
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        // Define the criteria how to select the locatioin provider -> use
-        // default
-        Criteria criteria = new Criteria();
-        provider = locationManager.getBestProvider(criteria, false);
-        //Location location = locationManager.getLastKnownLocation(provider);
+        if(!playbackMode){
+            mMap.setMyLocationEnabled(true);
 
-        if (depart != null) {
-            Marker depMarker = mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(depart.latitude, depart.longitude))
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-            pointMarkerMap.put(depMarker, depart);
-            dernierPointDeMarquage = depart;
+            // Get the location manager
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            // Define the criteria how to select the locatioin provider -> use
+            // default
+            Criteria criteria = new Criteria();
+            provider = locationManager.getBestProvider(criteria, false);
+
+            if (depart != null) {
+                Marker depMarker = mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(depart.latitude, depart.longitude))
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                pointMarkerMap.put(depMarker, depart);
+                dernierPointDeMarquage = depart;
+            }
+            if (arrivee != null) {
+                arriveeMarker = mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(arrivee.latitude, arrivee.longitude))
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+
+                //pointMarkerMap.put(arrMarker, arrivee);
+            }
         }
-        if (arrivee != null) {
-            Marker arrMarker = mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(arrivee.latitude, arrivee.longitude))
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-            pointMarkerMap.put(arrMarker, arrivee);
+        else{
+            /*ArrayList<PointDeMarquage> playbackPoints = RetrievePlaybackPoints();
+            depart = playbackPoints.get(0);
+            if (depart != null) {
+                Marker depMarker = mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(depart.latitude, depart.longitude))
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                pointMarkerMap.put(depMarker, depart);
+                dernierPointDeMarquage = depart;
+            }
+            for(int i = 1; i < playbackPoints.size(); i++){
+                PointDeMarquage point = playbackPoints.get(i);
+                Marker marker = mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(point.latitude, point.longitude))
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                pointMarkerMap.put(marker, point);
+            }
+
+            if (arrivee != null) {
+                Marker arrMarker = mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(arrivee.latitude, arrivee.longitude))
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                pointMarkerMap.put(arrMarker, arrivee);
+            }*/
         }
 
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(depart.latitude, depart.longitude), zoomFactor));
@@ -332,7 +368,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mod.setText("GPS");
 
                 TextView bat = (TextView) v.findViewById(R.id.infowindow_niveauBatterie);
-                bat.setText("Batterie : " + point.batterieLevel);
+                bat.setText("Batterie : " + point.batterieLevel + "%");
 
                 TextView sig = (TextView) v.findViewById(R.id.infowindow_signal);
                 sig.setText("Signal : " + point.signal + " dBm");
