@@ -67,4 +67,25 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Batterie"
         android:id="@+id/infowindow_niveauBatterie" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Signal"
+        android:id="@+id/infowindow_signal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="SSID"
+        android:id="@+id/infowindow_ssid" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="BSSID"
+        android:id="@+id/infowindow_bssid" />
 </LinearLayout>
