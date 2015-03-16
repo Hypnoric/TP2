@@ -23,6 +23,7 @@ public class MainActivity extends ActionBarActivity {
     private static boolean trajet3Existe;
 
     private float zoomFactor = 0;
+    private int locatingFrequency = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +58,7 @@ public class MainActivity extends ActionBarActivity {
             public void onProgressChanged(SeekBar seekBar, int progress,
                                           boolean fromUser) {
                 seekBarValue.setText(frequencyValue(seekBar.getProgress()) + " secondes");
+                locatingFrequency = frequencyValue(seekBar.getProgress());
             }
 
             @Override
@@ -72,6 +74,7 @@ public class MainActivity extends ActionBarActivity {
 
         SeekBar zoomSeekBar = (SeekBar)findViewById(R.id.zoomBar);
         zoomSeekBar.setMax(20);
+        zoomSeekBar.setProgress(10);
         final TextView zoomSeekBarValue = (TextView)findViewById(R.id.zoomText);
         zoomSeekBarValue.setText(String.valueOf(zoomSeekBar.getProgress() + " X"));
 
@@ -211,6 +214,7 @@ public class MainActivity extends ActionBarActivity {
         intent.putExtra("depart", depart);
         intent.putExtra("arrivee", arrivee);
         intent.putExtra("zoomFactor", zoomFactor);
+        intent.putExtra("locatingFrequency", locatingFrequency);
         startActivity(intent);
     }
 

@@ -2,12 +2,16 @@ package com.inf4215.tp2;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.BatteryManager;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
+import com.google.maps.android.SphericalUtil;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
@@ -61,12 +65,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String adresseArrivee;
     private PointDeMarquage depart;
     private PointDeMarquage arrivee;
+    private PointDeMarquage dernierPointDeMarquage;
     //private ArrayList<PointDeMarquage> points = new ArrayList<PointDeMarquage>();
     private HashMap<Marker, PointDeMarquage> pointMarkerMap = new HashMap<Marker, PointDeMarquage>();
     private String provider;
     private boolean trackingEnabled = false;
     private boolean locationEnabled = false;
     private float zoomFactor = 0;
+    private int locatingFrequency = 0;
+    private Intent batteryStatus;
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
@@ -80,12 +87,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         public double altitude;
         public boolean depart = false;
         public boolean arrivee = false;
-        // Direction array 3 float déplacement
-        // Distance relative parcourue double
-        // Distance Total double
-        // Mode De Localisation (GPS)
-        // Alarme + capture image d'identification de l'environnement
-        // Niveau de batterie
+        public double distanceRelative = 0;
+        public double distanceTotale = 0;
+        public int batterieLevel = 0;
+        public String direction = "";
     }
 
     @Override
@@ -100,6 +105,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             adresseDepart = extras.getString("depart");
             adresseArrivee = extras.getString("arrivee");
             zoomFactor = extras.getFloat("zoomFactor");
+            locatingFrequency = extras.getInt("locatingFrequency");
         }
 
         depart = getLatLongFromAddress(adresseDepart);
@@ -110,6 +116,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
         buildGoogleApiClient();
         setUpMap();
+
+        IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        batteryStatus = this.registerReceiver(null, ifilter);
     }
 
     @Override
@@ -140,7 +149,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             //.title(markerInfo)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
             //points.add(point);
+            point.distanceRelative = SphericalUtil.computeDistanceBetween(new LatLng(point.latitude, point.longitude), new LatLng(dernierPointDeMarquage.latitude, dernierPointDeMarquage.longitude));
+            point.distanceTotale = SphericalUtil.computeDistanceBetween(new LatLng(point.latitude, point.longitude), new LatLng(depart.latitude, depart.longitude));
+
+            int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+            int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+            float batteryPct = level / (float)scale;
+
+            point.batterieLevel = (int)(batteryPct * 100);
+
+            if(location.hasBearing()){
+                float bearing = location.getBearing();
+                if(bearing < 22.5 || bearing > 337.5)
+                    point.direction = "Est";
+                else if(bearing >= 22.5 && bearing < 67.5)
+                    point.direction = "Nord-Est";
+                else if(bearing >= 67.5 && bearing < 112.5 )
+                    point.direction = "Nord";
+                else if(bearing >= 112.5 && bearing < 157.5)
+                    point.direction = "Nord-Ouest";
+                else if(bearing >= 157.5 && bearing < 202.5)
+                    point.direction = "Ouest";
+                else if(bearing >= 202.5 && bearing < 247.5)
+                    point.direction = "Sud-Ouest";
+                else if(bearing >= 247.5 && bearing < 292.5)
+                    point.direction = "Sud";
+                else if(bearing >= 292.5 && bearing < 337.5)
+                    point.direction = "Sud-Est";
+            }
+            else{
+                point.direction = "Inconnue";
+            }
+
             pointMarkerMap.put(marker, point);
+
+            dernierPointDeMarquage = point;
         }
     }
 
@@ -156,8 +200,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     protected void startLocationUpdates() {
         LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(5000);
+        locationRequest.setInterval(locatingFrequency * 1000);
+        locationRequest.setFastestInterval(locatingFrequency * 1000);
         locationRequest.setSmallestDisplacement(0);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
@@ -201,6 +245,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .position(new LatLng(depart.latitude, depart.longitude))
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
             pointMarkerMap.put(depMarker, depart);
+            dernierPointDeMarquage = depart;
         }
         if (arrivee != null) {
             Marker arrMarker = mMap.addMarker(new MarkerOptions()
@@ -244,20 +289,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 String formattedAlt = df.format(point.altitude);
                 alt.setText("Altitude : "+formattedAlt);
 
-                /*TextView dir = (TextView) v.findViewById(R.id.infowindow_direction);
-                dir.setText();
+                TextView dir = (TextView) v.findViewById(R.id.infowindow_direction);
+                dir.setText("Direction : " + point.direction);
 
                 TextView distRel = (TextView) v.findViewById(R.id.infowindow_distanceRelative);
-                distRel.setText();
+                String formattedDistRel = df.format(point.distanceRelative);
+                distRel.setText("Distance Relative : "+formattedDistRel + "m");
 
                 TextView distTot = (TextView) v.findViewById(R.id.infowindow_distanceTotale);
-                distTot.setText();
+                String formattedDistTot = df.format(point.distanceTotale);
+                distTot.setText("Distance Totale : "+formattedDistTot + "m");
 
                 TextView mod = (TextView) v.findViewById(R.id.infowindow_modeLocalistion);
                 mod.setText("GPS");
 
                 TextView bat = (TextView) v.findViewById(R.id.infowindow_niveauBatterie);
-                bat.setText();*/
+                bat.setText("Batterie : " + point.batterieLevel);
 
                 return v;
             }
