@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Address;
 import android.location.Geocoder;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
@@ -35,6 +37,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,6 +67,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private float zoomFactor = 0;
     private int locatingFrequency = 0;
     private Intent batteryStatus;
+    private WifiManager wifi;
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
@@ -81,6 +85,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         public double distanceTotale = 0;
         public int batterieLevel = 0;
         public String direction = "";
+        public String ssid = "";
+        public String bssid = "";
+        public int signal = -100;
     }
 
     @Override
@@ -89,6 +96,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //On utilisera geocoder pour obtenir la latitude et logitude de ces points de depart pour creer les points de marquages
 
         super.onCreate(savedInstanceState);
+
+        wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        if (wifi.isWifiEnabled() == false)
+        {
+            Toast.makeText(getApplicationContext(), "wifi is disabled..making it enabled", Toast.LENGTH_SHORT).show();
+            wifi.setWifiEnabled(true);
+        }
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -177,6 +191,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             pointMarkerMap.put(marker, point);
 
             dernierPointDeMarquage = point;
+
+            wifi.startScan();
+            List<ScanResult> results = wifi.getScanResults();
+            if(results.size() > 0)
+            {
+                Toast.makeText(getApplicationContext(), "Point d'acces wifi detecte", Toast.LENGTH_SHORT).show();
+                for(int i = 0; i < results.size(); ++i)
+                {
+                    if(point.signal < results.get(i).level)
+                    {
+                        point.signal = results.get(i).level;
+                        point.ssid = results.get(i).SSID;
+                        point.bssid = results.get(i).BSSID;
+                    }
+                }
+            }
         }
     }
 
@@ -310,6 +340,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 TextView bat = (TextView) v.findViewById(R.id.infowindow_niveauBatterie);
                 bat.setText("Batterie : " + point.batterieLevel);
+
+                TextView sig = (TextView) v.findViewById(R.id.infowindow_signal);
+                sig.setText("Signal : " + point.signal + " dBm");
+
+                TextView ssid = (TextView) v.findViewById(R.id.infowindow_ssid);
+                ssid.setText("SSID : " + point.ssid);
+
+                TextView bssid = (TextView) v.findViewById(R.id.infowindow_bssid);
+                bssid.setText("BSSID : " + point.bssid);
 
                 return v;
             }
