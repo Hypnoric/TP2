@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.database.sqlite.SQLiteDatabase;
+import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -167,6 +168,19 @@ public class MainActivity extends ActionBarActivity {
         return myQuittingDialogBox;
     }
 
+    private boolean isOk(String adresse)
+    {
+        boolean ok = true;
+        for(int i = 0; i < adresse.length(); ++i)
+        {
+            if(!Character.isLetterOrDigit(adresse.charAt(i)) && adresse.charAt(i) != ' '
+                    && adresse.charAt(i) != ',' && adresse.charAt(i) != '-'){
+                ok = false;
+            }
+        }
+        return ok;
+    }
+
     private AlertDialog askTrajet()
     {
         final EditText depart = new EditText(this);
@@ -193,7 +207,11 @@ public class MainActivity extends ActionBarActivity {
 
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        openMap(depart.getText().toString(), arrivee.getText().toString());
+                        if (isOk(depart.getText().toString()) && isOk(arrivee.getText().toString())){
+                                openMap(depart.getText().toString(), arrivee.getText().toString());
+                        } else {
+                            Toast.makeText(MainActivity.this, "Les adresses ne doivent pas contenir de caracteres speciaux", Toast.LENGTH_LONG).show();
+                        }
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
