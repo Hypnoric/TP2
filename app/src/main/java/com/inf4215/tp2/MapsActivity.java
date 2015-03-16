@@ -180,6 +180,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    private float distFrom(float lat1, float lng1, float lat2, float lng2) {
+        double earthRadius = 6371000; //meters
+        double dLat = Math.toRadians(lat2-lat1);
+        double dLng = Math.toRadians(lng2-lng1);
+        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLng/2) * Math.sin(dLng/2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        float dist = (float) (earthRadius * c);
+
+        return dist;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -315,7 +328,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void run() {
                 if (trackingEnabled) {
-                    RetrievePositionInformation();
+                    //RetrievePositionInformation();
                     handler.postDelayed(this, 5000); // Change this time in function of sampling frequency
                 }
             }
@@ -351,8 +364,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mListener.onLocationChanged(location);
         }*/
 
-        if (location != null)
+        if (location != null) {
             mLastKnownLocation = location;
+            RetrievePositionInformation();
+        }
     }
 
     /*@Override

@@ -78,7 +78,7 @@ public class MainActivity extends ActionBarActivity {
         zoomSeekBar.setProgress(10);
         final TextView zoomSeekBarValue = (TextView)findViewById(R.id.zoomText);
         zoomSeekBarValue.setText(String.valueOf(zoomSeekBar.getProgress() + " X"));
-
+        zoomFactor = zoomSeekBar.getProgress();
         zoomSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
 
             @Override
