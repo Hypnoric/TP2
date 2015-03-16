@@ -112,21 +112,45 @@ public class MainActivity extends ActionBarActivity {
         return trajet3Existe;
     }
 
+    static public int getCptBD(){
+        return cptBD;
+    }
+
     static public void addToDataBase(String adresseDepart, String adresseArrivee, MapsActivity.PointDeMarquage[] ptsMarquages){
         String tableName = "Trajet" + Integer.toString(cptBD);
         trajets.execSQL("DROP TABLE IF EXISTS " + tableName);
-        trajets.execSQL("CREATE TABLE IF NOT EXISTS "+ tableName + "(Depart VARCHAR,Arrivee VARCHAR);");
-        String inserts = "'" + adresseDepart + "','" + adresseArrivee + "'";
-        trajets.execSQL("INSERT INTO "+ tableName + " VALUES(" + inserts + ");");
+        trajets.execSQL("CREATE TABLE IF NOT EXISTS "+ tableName + "(AdresseDep VARCHAR,AdresseArr VARCHAR);");
+        trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Latitude DOUBLE");
+        trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Longitude DOUBLE");
+        trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Altitude DOUBLE");
+        trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Depart INTEGER");
+        trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Arrivee INTEGER");
+        trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN DistanceRelative DOUBLE");
+        trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN DistanceTotale DOUBLE");
+        trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN BatterieLevel INTEGER");
+        trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Direction VARCHAR");
+        trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Ssid VARCHAR");
+        trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Bssid VARCHAR");
+        trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Signal INTEGER");
         for(int i = 0; i < ptsMarquages.length; ++i){
-            trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Latitude" + Integer.toString(i) + " DOUBLE");
-            trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Longitude" + Integer.toString(i) + " DOUBLE");
-            trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Altitude" + Integer.toString(i) + " DOUBLE");
-            /*trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Deplacement" + Integer.toString(i) + " VARCHAR");
-            trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Distance" + Integer.toString(i) + " DOUBLE");
-            trajets.execSQL("ALTER TABLE " + tableName + " ADD COLUMN Batterie" + Integer.toString(i) + " DOUBLE");*/
-            inserts = "'" + ptsMarquages[i].latitude + "','" + ptsMarquages[i].longitude + "','" + ptsMarquages[i].altitude + "'";
-            trajets.execSQL("INSERT INTO "+ tableName + " VALUES(" + inserts + ");");
+            int valDepart = (ptsMarquages[i].depart) ? 1 : 0;
+            int valArrivee = (ptsMarquages[i].arrivee) ? 1 : 0;
+            String inserts =
+                    "'" + adresseDepart + "','"
+                    + adresseArrivee + "', "
+                    + ptsMarquages[i].latitude + ", "
+                    + ptsMarquages[i].longitude + ", "
+                    + ptsMarquages[i].altitude + ", "
+                    + valDepart + ", "
+                    + valArrivee + ", "
+                    + ptsMarquages[i].distanceRelative + ", "
+                    + ptsMarquages[i].distanceTotale + ", "
+                    + ptsMarquages[i].batterieLevel + ", "
+                    + "'" + ptsMarquages[i].direction+ "','"
+                    + ptsMarquages[i].ssid + "','"
+                    + ptsMarquages[i].bssid + "', "
+                    + ptsMarquages[i].signal;
+            trajets.execSQL("INSERT INTO " + tableName + " (AdresseDep,AdresseArr,Latitude,Longitude,Altitude,Depart,Arrivee,DistanceRelative,DistanceTotale,BatterieLevel,Direction,Ssid,Bssid,Signal) VALUES(" + inserts + ");");
         }
 
         if(cptBD == 1)
@@ -233,6 +257,8 @@ public class MainActivity extends ActionBarActivity {
         intent.putExtra("arrivee", arrivee);
         intent.putExtra("zoomFactor", zoomFactor);
         intent.putExtra("locatingFrequency", locatingFrequency);
+        intent.putExtra("replay", false);
+        intent.putExtra("numeroTrajet", 0);
         startActivity(intent);
     }
 
