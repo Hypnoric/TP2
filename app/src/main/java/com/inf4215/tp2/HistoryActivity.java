@@ -1,10 +1,13 @@
 package com.inf4215.tp2;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 
 
@@ -15,8 +18,31 @@ public class HistoryActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
 
+
+        String a = "1";
+        String b = "2";
+        String c = "3";
+        if(MainActivity.getCptBD() == 1)
+        {
+            a = "3";
+            b = "2";
+            c = "1";
+        }
+        else if(MainActivity.getCptBD() == 2)
+        {
+            a = "1";
+            b = "3";
+            c = "2";
+        }
+        else if(MainActivity.getCptBD() == 3)
+        {
+            a = "2";
+            b = "1";
+            c = "3";
+        }
+
         if(MainActivity.getTrajet1Existe()) {
-            Cursor resultSet = MainActivity.trajets.rawQuery("Select * from Trajet1", null);
+            Cursor resultSet = MainActivity.trajets.rawQuery("Select * from Trajet" + a, null);
             resultSet.moveToFirst();
             String depart = resultSet.getString(0);
             String arrivee = resultSet.getString(1);
@@ -27,7 +53,7 @@ public class HistoryActivity extends Activity {
         }
 
         if(MainActivity.getTrajet2Existe()) {
-            Cursor resultSet = MainActivity.trajets.rawQuery("Select * from Trajet2", null);
+            Cursor resultSet = MainActivity.trajets.rawQuery("Select * from Trajet" + b, null);
             resultSet.moveToFirst();
             String depart = resultSet.getString(0);
             String arrivee = resultSet.getString(1);
@@ -38,7 +64,7 @@ public class HistoryActivity extends Activity {
         }
 
         if(MainActivity.getTrajet3Existe()) {
-            Cursor resultSet = MainActivity.trajets.rawQuery("Select * from Trajet3", null);
+            Cursor resultSet = MainActivity.trajets.rawQuery("Select * from Trajet" + c, null);
             resultSet.moveToFirst();
             String depart = resultSet.getString(0);
             String arrivee = resultSet.getString(1);
@@ -49,6 +75,38 @@ public class HistoryActivity extends Activity {
         }
     }
 
+    public void onH1ButtonClick(View v){
+        Intent intent = new Intent(this, MapsActivity.class);
+        intent.putExtra("depart", "depart");
+        intent.putExtra("arrivee", "arrivee");
+        intent.putExtra("zoomFactor", 10);
+        intent.putExtra("locatingFrequency", 0);
+        intent.putExtra("playbackMode", true);
+        intent.putExtra("numeroTrajet", 1);
+        startActivity(intent);
+    }
+
+    public void onH2ButtonClick(View v){
+        Intent intent = new Intent(this, MapsActivity.class);
+        intent.putExtra("depart", "depart");
+        intent.putExtra("arrivee", "arrivee");
+        intent.putExtra("zoomFactor", 10);
+        intent.putExtra("locatingFrequency", 0);
+        intent.putExtra("playbackMode", true);
+        intent.putExtra("numeroTrajet", 2);
+        startActivity(intent);
+    }
+
+    public void onH3ButtonClick(View v){
+        Intent intent = new Intent(this, MapsActivity.class);
+        intent.putExtra("depart", "depart");
+        intent.putExtra("arrivee", "arrivee");
+        intent.putExtra("zoomFactor", 10);
+        intent.putExtra("locatingFrequency", 0);
+        intent.putExtra("playbackMode", true);
+        intent.putExtra("numeroTrajet", 3);
+        startActivity(intent);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
