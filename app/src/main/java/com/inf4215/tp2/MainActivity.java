@@ -52,7 +52,7 @@ public class MainActivity extends ActionBarActivity {
         SeekBar seekBar = (SeekBar)findViewById(R.id.frequenceBar);
         final TextView seekBarValue = (TextView)findViewById(R.id.freqText);
         seekBarValue.setText(String.valueOf(frequencyValue(seekBar.getProgress()) + " secondes"));
-
+        locatingFrequency = frequencyValue(seekBar.getProgress());
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
 
             @Override

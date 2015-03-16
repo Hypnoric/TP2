@@ -59,6 +59,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private PointDeMarquage depart;
     private PointDeMarquage arrivee;
     private PointDeMarquage dernierPointDeMarquage;
+    private boolean destinationReached = false;
     //private ArrayList<PointDeMarquage> points = new ArrayList<PointDeMarquage>();
     private HashMap<Marker, PointDeMarquage> pointMarkerMap = new HashMap<Marker, PointDeMarquage>();
     private String provider;
@@ -147,7 +148,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             point.latitude = location.getLatitude();
             point.longitude = location.getLongitude();
             point.altitude = location.getAltitude();
-            //String markerInfo = "Marker " + points.size() + "\nLatitude : " + point.latitude + "\nLongitude : " + point.longitude + "\nAltitude : " + point.altitude;
             Marker marker = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(point.latitude, point.longitude))
                             //.title(markerInfo)
@@ -155,6 +155,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //points.add(point);
             point.distanceRelative = SphericalUtil.computeDistanceBetween(new LatLng(point.latitude, point.longitude), new LatLng(dernierPointDeMarquage.latitude, dernierPointDeMarquage.longitude));
             point.distanceTotale = SphericalUtil.computeDistanceBetween(new LatLng(point.latitude, point.longitude), new LatLng(depart.latitude, depart.longitude));
+
+            if(SphericalUtil.computeDistanceBetween(new LatLng(point.latitude, point.longitude), new LatLng(arrivee.latitude, arrivee.longitude)) <= 10) {
+                //Less than 10 meters from destination ... considered reached
+                destinationReached = true;
+                Toast.makeText(getApplicationContext(), "You have reached your destination", Toast.LENGTH_LONG).show();
+            }
 
             int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
             int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
@@ -208,19 +214,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         }
-    }
-
-    private float distFrom(float lat1, float lng1, float lat2, float lng2) {
-        double earthRadius = 6371000; //meters
-        double dLat = Math.toRadians(lat2-lat1);
-        double dLng = Math.toRadians(lng2-lng1);
-        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-                        Math.sin(dLng/2) * Math.sin(dLng/2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        float dist = (float) (earthRadius * c);
-
-        return dist;
     }
 
     @Override
