@@ -128,8 +128,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         depart.depart = true;
         arrivee = getLatLongFromAddress(adresseArrivee);
         arrivee.arrivee = true;
-        arrivee.latitude = 45.6060755;
-        arrivee.longitude = -73.530734;
 
         setContentView(R.layout.activity_maps);
         buildGoogleApiClient();
