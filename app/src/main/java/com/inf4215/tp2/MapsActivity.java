@@ -13,6 +13,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapFragment;
@@ -20,6 +21,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.content.Context;
@@ -27,6 +29,8 @@ import android.location.Criteria;
 import android.location.Location;
 //import android.location.LocationListener;
 import android.location.LocationManager;
+import android.view.View;
+import android.widget.TextView;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -40,7 +44,9 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -55,10 +61,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String adresseArrivee;
     private PointDeMarquage depart;
     private PointDeMarquage arrivee;
-    private ArrayList<PointDeMarquage> points = new ArrayList<PointDeMarquage>();
+    //private ArrayList<PointDeMarquage> points = new ArrayList<PointDeMarquage>();
+    private HashMap<Marker, PointDeMarquage> pointMarkerMap = new HashMap<Marker, PointDeMarquage>();
     private String provider;
     private boolean trackingEnabled = false;
     private boolean locationEnabled = false;
+    private float zoomFactor = 0;
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
@@ -66,9 +74,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public class PointDeMarquage {
+        public int index;
         public double latitude;
         public double longitude;
         public double altitude;
+        public boolean depart = false;
+        public boolean arrivee = false;
         // Direction array 3 float déplacement
         // Distance relative parcourue double
         // Distance Total double
@@ -88,10 +99,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (extras != null) {
             adresseDepart = extras.getString("depart");
             adresseArrivee = extras.getString("arrivee");
+            zoomFactor = extras.getFloat("zoomFactor");
         }
 
         depart = getLatLongFromAddress(adresseDepart);
+        depart.depart = true;
         arrivee = getLatLongFromAddress(adresseArrivee);
+        arrivee.arrivee = true;
 
         setContentView(R.layout.activity_maps);
         buildGoogleApiClient();
@@ -120,12 +134,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             point.latitude = location.getLatitude();
             point.longitude = location.getLongitude();
             point.altitude = location.getAltitude();
-            String markerInfo = "Marker " + points.size() + "\nLatitude : " + point.latitude + "\nLongitude : " + point.longitude + "\nAltitude : " + point.altitude;
-            mMap.addMarker(new MarkerOptions()
+            //String markerInfo = "Marker " + points.size() + "\nLatitude : " + point.latitude + "\nLongitude : " + point.longitude + "\nAltitude : " + point.altitude;
+            Marker marker = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(point.latitude, point.longitude))
-                    .title(markerInfo)
+                            //.title(markerInfo)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
-            points.add(point);
+            //points.add(point);
+            pointMarkerMap.put(marker, point);
         }
     }
 
@@ -182,17 +197,77 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Location location = locationManager.getLastKnownLocation(provider);
 
         if (depart != null) {
-            mMap.addMarker(new MarkerOptions()
+            Marker depMarker = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(depart.latitude, depart.longitude))
-                    .title("Depart")
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+            pointMarkerMap.put(depMarker, depart);
         }
         if (arrivee != null) {
-            mMap.addMarker(new MarkerOptions()
+            Marker arrMarker = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(arrivee.latitude, arrivee.longitude))
-                    .title("Arrivee")
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+            pointMarkerMap.put(arrMarker, arrivee);
         }
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(depart.latitude, depart.longitude), zoomFactor));
+
+        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+            @Override
+            public View getInfoWindow(Marker marker) {
+
+                PointDeMarquage point = pointMarkerMap.get(marker);
+
+                DecimalFormat df = new DecimalFormat("#.##");
+
+                // Getting view from the layout file
+                View v = getLayoutInflater().inflate(R.layout.custom_infowindow, null);
+
+                TextView title = (TextView) v.findViewById(R.id.infowindow_title);
+                if(point.depart)
+                    title.setText("Depart");
+                else if(point.arrivee)
+                    title.setText("Arrivee");
+                else
+                    title.setText("Point " + point.index);
+
+
+                TextView lat = (TextView) v.findViewById(R.id.infowindow_latitude);
+                String formattedLat = df.format(point.latitude);
+                lat.setText("Latitude : "+formattedLat);
+
+                TextView lng = (TextView) v.findViewById(R.id.infowindow_longitude);
+                String formattedLng = df.format(point.longitude);
+                lng.setText("Longitude : "+formattedLng);
+
+                TextView alt = (TextView) v.findViewById(R.id.infowindow_altitude);
+                String formattedAlt = df.format(point.altitude);
+                alt.setText("Altitude : "+formattedAlt);
+
+                /*TextView dir = (TextView) v.findViewById(R.id.infowindow_direction);
+                dir.setText();
+
+                TextView distRel = (TextView) v.findViewById(R.id.infowindow_distanceRelative);
+                distRel.setText();
+
+                TextView distTot = (TextView) v.findViewById(R.id.infowindow_distanceTotale);
+                distTot.setText();
+
+                TextView mod = (TextView) v.findViewById(R.id.infowindow_modeLocalistion);
+                mod.setText("GPS");
+
+                TextView bat = (TextView) v.findViewById(R.id.infowindow_niveauBatterie);
+                bat.setText();*/
+
+                return v;
+            }
+
+            @Override
+            public View getInfoContents(Marker arg0) {
+                // TODO Auto-generated method stub
+                return null;
+            }
+        });
 
         trackingEnabled = true;
         final Handler handler = new Handler();

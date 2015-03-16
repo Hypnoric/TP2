@@ -22,6 +22,8 @@ public class MainActivity extends ActionBarActivity {
     private static boolean trajet2Existe;
     private static boolean trajet3Existe;
 
+    private float zoomFactor = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +71,7 @@ public class MainActivity extends ActionBarActivity {
         });
 
         SeekBar zoomSeekBar = (SeekBar)findViewById(R.id.zoomBar);
+        zoomSeekBar.setMax(20);
         final TextView zoomSeekBarValue = (TextView)findViewById(R.id.zoomText);
         zoomSeekBarValue.setText(String.valueOf(zoomSeekBar.getProgress() + " X"));
 
@@ -78,6 +81,7 @@ public class MainActivity extends ActionBarActivity {
             public void onProgressChanged(SeekBar zoomSeekBar, int progress,
                                           boolean fromUser) {
                 zoomSeekBarValue.setText(zoomSeekBar.getProgress() + " X");
+                zoomFactor = zoomSeekBar.getProgress();
             }
 
             @Override
@@ -206,6 +210,7 @@ public class MainActivity extends ActionBarActivity {
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra("depart", depart);
         intent.putExtra("arrivee", arrivee);
+        intent.putExtra("zoomFactor", zoomFactor);
         startActivity(intent);
     }
 
