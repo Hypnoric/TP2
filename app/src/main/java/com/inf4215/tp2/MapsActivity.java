@@ -172,6 +172,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 point.direction = "Inconnue";
             }
 
+            point.index = dernierPointDeMarquage.index + 1;
+
             pointMarkerMap.put(marker, point);
 
             dernierPointDeMarquage = point;
